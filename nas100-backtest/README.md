@@ -12,8 +12,13 @@ experimental variants. The baseline settings are in `config.py`.
 - Stop: 20 points; target: 40 points.
 - Risk budget: $75 per trade; target budget: $150 per trade.
 - Maximum: two trades per trading day.
-- After a stop-loss, the second setup waits for a touch of the first entry
-  price and takes the opposite direction.
+- If the first trade hits SL, the second setup waits for a touch of the first
+  entry price and takes the opposite direction.
+- If the first trade hits TP, trading stops for that day; no second trade is
+  opened.
+- A maximum of two trades are allowed per trading day.
+- No new entries are opened after 12:30. Existing positions remain active
+  until SL or TP, including after 12:30 and across subsequent sessions.
 - The current simulator does not open a new trade on the same candle that
   closes the previous trade.
 
@@ -76,10 +81,8 @@ two-trades-per-day limit. It does not modify the simulator's entry/exit logic.
    were inside the candle, but not which was touched first. The current
    simulator skips that ambiguous candle. Tick or lower-timeframe data is
    needed to enforce a true first-touch rule without guessing.
-4. **Session end:** the baseline simulator stops opening new positions at
-   12:30, but it can continue managing an open position after that time.
-   Confirm whether the intended rule is "no new entries after 12:30" or
-   "close all positions at 12:30" before changing it.
+4. **Session end:** the confirmed rule is no new entries after 12:30, while
+   existing positions remain active until SL or TP, even across sessions.
 5. **Intrabar fills:** 1-minute OHLC candles cannot reconstruct the exact order
    of every event inside a candle. The simulator uses conservative assumptions
    in selected ambiguous cases; results should be checked against tick data
