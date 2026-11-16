@@ -13,7 +13,20 @@ if BACKTEST_DIR not in sys.path:
     sys.path.insert(0, BACKTEST_DIR)
 
 import config
+from trade_simulator import next_daily_state
 from validation import StrategyConfig, validate_ohlcv, validate_trade_ledger
+
+
+class DailyStateTransitionTests(unittest.TestCase):
+    def test_first_trade_stop_loss_allows_retest(self):
+        self.assertEqual(next_daily_state("SL", 1), "retest")
+
+    def test_first_trade_take_profit_ends_day(self):
+        self.assertEqual(next_daily_state("TP", 1), "done")
+
+    def test_second_trade_always_ends_day(self):
+        self.assertEqual(next_daily_state("SL", 2), "done")
+        self.assertEqual(next_daily_state("TP", 2), "done")
 
 
 class StrategyConfigTests(unittest.TestCase):
