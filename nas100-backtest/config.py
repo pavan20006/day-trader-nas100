@@ -44,6 +44,6 @@ SLIPPAGE_POINTS = 0.0
 AMBIGUOUS_SL_TP_POLICY = "stop_first"
 AMBIGUOUS_OR_TOUCH_POLICY = "skip"
 
-# Existing simulator manages an open position after the entry window.
-# Change only after confirming whether positions must be flattened at 12:30.
+# Confirmed rule: no new entries after 12:30, but existing positions remain
+# open until SL or TP, including across subsequent sessions.
 FORCE_CLOSE_AT_SESSION_END = False
