@@ -73,6 +73,16 @@ def check_entry_candle_stop(position, candle):
     return None, None
 
 
+def next_daily_state(outcome, completed_trade_count):
+    """Return the only permitted next setup state for this strategy."""
+    if completed_trade_count >= config.MAX_TRADES_PER_DAY:
+        return "done"
+    if outcome == "SL":
+        return "retest"
+    # A first-trade TP ends the day's trading; there is no second setup.
+    return "done"
+
+
 def simulate_all_days():
     """Simulate the strategy chronologically, including overnight positions."""
 
@@ -133,14 +143,9 @@ def simulate_all_days():
         day_state = get_daily_state(position["strategy_date"])
         day_state["trades"].append(trade)
 
-        if len(day_state["trades"]) >= config.MAX_TRADES_PER_DAY:
-            day_state["state"] = "done"
-        elif outcome == "SL":
-            day_state["state"] = "retest"
-        elif outcome == "TP":
-            day_state["state"] = "boundary"
-        else:
-            day_state["state"] = "done"
+        day_state["state"] = next_daily_state(
+            outcome, len(day_state["trades"])
+        )
 
         position = None
 
@@ -217,26 +222,6 @@ def simulate_all_days():
             )
             entry = get_entry_price(candle, retest_price, direction)
             setup = "REVERSAL_AFTER_SL"
-
-        elif state == "boundary":
-            upper_touched = high >= or_high
-            lower_touched = low <= or_low
-
-            if upper_touched and lower_touched:
-                continue
-
-            if upper_touched:
-                direction = "SELL"
-                entry = get_entry_price(candle, or_high, direction)
-                setup = "SECOND_TRADE_ORH"
-
-            elif lower_touched:
-                direction = "BUY"
-                entry = get_entry_price(candle, or_low, direction)
-                setup = "SECOND_TRADE_ORL"
-
-            else:
-                continue
 
         else:
             continue
