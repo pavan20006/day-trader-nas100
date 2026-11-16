@@ -5,7 +5,7 @@ import unittest
 
 from _load import ROOT
 
-# v2, the day-trading pack: the eleven folders the reel's repo card shows
+# Existing day-trading skills plus the independent NAS100 backtesting module
 SKILLS = ["trader-scanner", "trader-news", "trader-entry", "trader-exit", "trader-timemachine",
           "trader-risk", "trader-budget", "trader-broker", "trader-alerts", "trader-analyst",
           "trader-pelosi"]
@@ -40,7 +40,7 @@ class Repo(unittest.TestCase):
 
     def test_root_matches_the_reel(self):
         root = sorted(d for d in os.listdir(ROOT) if not d.startswith(".git"))
-        self.assertEqual(root, sorted([".claude-plugin", "LICENSE", "README.md", "tests"] + SKILLS))
+        self.assertEqual(root, sorted([".claude-plugin", "LICENSE", "README.md", "tests", "nas100-backtest"] + SKILLS))
 
     def test_frontmatter_name_and_description(self):
         for s in SKILLS:
